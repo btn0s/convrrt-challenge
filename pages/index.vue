@@ -15,8 +15,8 @@ export default Vue.extend({
   computed: {
     sections() {
       const { sectionIds } = this.$store.getters
-      const sections = []
-      sectionIds.forEach((id) => {
+      const sections: object[] = []
+      sectionIds.forEach((id: string) => {
         sections.push(this.$store.getters.sectionById(id))
       })
       return sections

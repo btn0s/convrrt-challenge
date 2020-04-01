@@ -29,8 +29,8 @@ export default {
   computed: {
     blocks() {
       const { blockIds } = this.section
-      const blocks = []
-      blockIds.forEach((id) => {
+      const blocks: object[] = []
+      blockIds.forEach((id: string) => {
         blocks.push(this.$store.getters.blockById(id))
       })
       return blocks
@@ -60,20 +60,6 @@ export default {
         gridColumnEnd: col,
         gridRowStart: row,
         gridRowEnd: row
-      }
-    },
-    calcColPosition(col: Column): object {
-      const { x, y } = col.coords
-      const { h, w } = col.dimensions
-
-      const colStart = x === 0 ? 1 : x
-      const rowStart = y === 0 ? 1 : y
-
-      return {
-        gridColumnStart: colStart,
-        gridColumnEnd: colStart + w,
-        gridRowStart: rowStart,
-        gridRowEnd: rowStart + h
       }
     }
   }

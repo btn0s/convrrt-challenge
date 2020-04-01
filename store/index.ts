@@ -32,16 +32,16 @@ export type RootState = ReturnType<typeof state>
 
 export const getters: GetterTree<RootState, RootState> = {
   sectionIds: (state) => state.builder.sectionIds,
-  sectionById: (state) => (id) => {
+  sectionById: (state) => (id: string) => {
     return state.sections[id]
   },
-  blockById: (state) => (id) => {
+  blockById: (state) => (id: string) => {
     return state.blocks[id]
   }
 }
 
 export const mutations: MutationTree<RootState> = {
-  UPDATE_BLOCK: (state) => (payload: object) => {
+  UPDATE_BLOCK: (state) => (payload: { id: string; data: object }) => {
     const { id, data } = payload
     state.blocks[id] = { ...state.blocks[id], data }
   }
