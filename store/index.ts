@@ -1,12 +1,5 @@
 import { GetterTree, ActionTree, MutationTree } from 'vuex'
 
-const DEFAULT_BLOCK = {
-  x: 0,
-  y: 0,
-  h: 2,
-  w: 2
-}
-
 export const state = () => ({
   sections: {
     s1: {
@@ -50,7 +43,7 @@ export const getters: GetterTree<RootState, RootState> = {
 export const mutations: MutationTree<RootState> = {
   UPDATE_BLOCK: (state) => (payload: object) => {
     const { id, data } = payload
-    Vue.set(state.blocks, id, { ...state.blocks[id], data })
+    state.blocks[id] = { ...state.blocks[id], data }
   }
 }
 
