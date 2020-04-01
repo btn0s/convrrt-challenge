@@ -40,9 +40,6 @@ export default {
     }
   },
   methods: {
-    handleDrop(e) {
-      console.log(e)
-    },
     calcCellPosition(index: number): object {
       let col
       let row
