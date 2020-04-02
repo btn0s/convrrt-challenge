@@ -2,7 +2,6 @@
   <div
     :class="{ Block: true, isDragging: isDragging, isResizing: isResizing }"
     :style="blockPlacement"
-    @mousemove="(e) => handleMouseMove(e)"
   >
     <div class="Content">
       {{ block.id }}
@@ -11,6 +10,7 @@
       class="Ghost"
       :style="ghostDraggingStyle"
       @mouseup="(e) => handleMouseUp(e)"
+      @mousemove="(e) => handleMouseMove(e)"
     >
       <div class="Icon DragIcon" @mousedown="(e) => handleDragStart(e)">
         DRAG
@@ -75,23 +75,23 @@ export default {
     },
     handleDragStart(e) {
       const { clientX, clientY, offsetX, offsetY } = e
-      const { offsetHeight, offsetWidth } = e.target.offsetParent.parentElement
+      const boxNode = e.target.parentNode.parentNode.getBoundingClientRect()
+      const { height, width } = boxNode
 
       this.ghostDraggingStyle = {
-        height: `${offsetHeight}px`,
-        width: `${offsetWidth}px`,
+        height: `${height}px`,
+        width: `${width}px`,
         top: `${clientY}px`,
         left: `${clientX}px`,
         transform: `translate(${-Math.abs(offsetX)}px,${-Math.abs(offsetY)}px)`
       }
 
-      this.dragStartCoords.x = clientX
-      this.dragStartCoords.y = clientY
       this.isDragging = true
     },
     handleDrag(e) {
-      e.preventDefault()
       const { clientX, clientY } = e
+      const boxNode = e.target.parentNode.parentNode.getBoundingClientRect()
+      const { x, y } = boxNode
 
       this.ghostDraggingStyle = {
         ...this.ghostDraggingStyle,
@@ -99,42 +99,32 @@ export default {
         left: `${clientX}px`
       }
 
-      const movementX = clientX - this.dragStartCoords.x
-      const movementY = clientY - this.dragStartCoords.y
+      const movementX = clientX - x
+      const movementY = clientY - y
 
-      if (movementX > 40) {
-        this.dragStartCoords.x = clientX
-
+      if (movementX > 70) {
         if (this.blockData.x < 11) {
           this.blockData.x += 1
         }
-      } else if (movementX < -40) {
-        this.dragStartCoords.x = clientX
-
+      } else if (movementX < -70) {
         if (this.blockData.x > 0) {
           this.blockData.x -= 1
         }
       }
 
-      if (movementY > 20) {
-        this.dragStartCoords.y = clientY
-
+      if (movementY > 50) {
         if (this.blockData.y < 2) {
           this.blockData.y += 1
         }
-      } else if (movementY < -20) {
-        this.dragStartCoords.y = clientY
-
+      } else if (movementY < -50) {
         if (this.blockData.y > 0) {
           this.blockData.y -= 1
         }
       }
     },
-    handleDragEnd(e) {
-      e.preventDefault()
-      this.dragStartCoords = { x: 0, y: 0 }
-      this.ghostDraggingStyle = {}
+    handleDragEnd() {
       this.isDragging = false
+      this.ghostDraggingStyle = {}
       this.update({
         id: this.blockData.id,
         data: { ...this.blockData }
@@ -229,6 +219,7 @@ export default {
 <style>
 .Block {
   @apply relative;
+  user-select: none;
 }
 
 .Block.isDragging .Content,
