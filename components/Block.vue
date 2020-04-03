@@ -8,7 +8,7 @@
     </div>
     <div
       class="Ghost"
-      :style="ghostDraggingStyle"
+      :style="ghostStyle"
       @mouseup="(e) => handleMouseUp(e)"
       @mousemove="(e) => handleMouseMove(e)"
     >
@@ -32,8 +32,7 @@ export default {
       isDragging: false,
       isResizing: false,
       resizeData: {},
-      dragStartCoords: { x: 0, y: 0 },
-      ghostDraggingStyle: {},
+      ghostStyle: {},
       blockData: {}
     }
   },
@@ -75,10 +74,12 @@ export default {
     },
     handleDragStart(e) {
       const { clientX, clientY, offsetX, offsetY } = e
-      const boxNode = e.target.parentNode.parentNode.getBoundingClientRect()
-      const { height, width } = boxNode
+      const {
+        height,
+        width
+      } = e.target.parentNode.parentNode.getBoundingClientRect()
 
-      this.ghostDraggingStyle = {
+      this.ghostStyle = {
         height: `${height}px`,
         width: `${width}px`,
         top: `${clientY}px`,
@@ -90,11 +91,10 @@ export default {
     },
     handleDrag(e) {
       const { clientX, clientY } = e
-      const boxNode = e.target.parentNode.parentNode.getBoundingClientRect()
-      const { x, y } = boxNode
+      const { x, y } = e.target.parentNode.parentNode.getBoundingClientRect()
 
-      this.ghostDraggingStyle = {
-        ...this.ghostDraggingStyle,
+      this.ghostStyle = {
+        ...this.ghostStyle,
         top: `${clientY}px`,
         left: `${clientX}px`
       }
@@ -124,7 +124,7 @@ export default {
     },
     handleDragEnd() {
       this.isDragging = false
-      this.ghostDraggingStyle = {}
+      this.ghostStyle = {}
       this.update({
         id: this.blockData.id,
         data: { ...this.blockData }
@@ -139,7 +139,7 @@ export default {
         offsetLeft
       } = e.target.offsetParent.parentElement
 
-      this.ghostDraggingStyle = {
+      this.ghostStyle = {
         height: `${offsetHeight}px`,
         width: `${offsetWidth}px`,
         top: `${offsetTop}px`,
@@ -164,8 +164,8 @@ export default {
       const ghostH = this.resizeData.h + growthY
       const ghostW = this.resizeData.w + growthX
 
-      this.ghostDraggingStyle = {
-        ...this.ghostDraggingStyle,
+      this.ghostStyle = {
+        ...this.ghostStyle,
         height: `${ghostH}px`,
         width: `${ghostW}px`
       }
@@ -204,7 +204,7 @@ export default {
     },
     handleResizeEnd(e) {
       e.preventDefault()
-      this.ghostDraggingStyle = {}
+      this.ghostStyle = {}
       this.resizeData = {}
       this.isResizing = false
       this.update({
