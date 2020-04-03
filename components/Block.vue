@@ -2,15 +2,15 @@
   <div
     :class="{ Block: true, isDragging: isDragging, isResizing: isResizing }"
     :style="blockPlacement"
-    @mousemove="(e) => handleMouseMove(e)"
   >
     <div class="Content">
       {{ block.id }}
     </div>
     <div
       class="Ghost"
-      :style="ghostDraggingStyle"
+      :style="ghostStyle"
       @mouseup="(e) => handleMouseUp(e)"
+      @mousemove="(e) => handleMouseMove(e)"
     >
       <div class="Icon DragIcon" @mousedown="(e) => handleDragStart(e)">
         DRAG
@@ -32,8 +32,7 @@ export default {
       isDragging: false,
       isResizing: false,
       resizeData: {},
-      dragStartCoords: { x: 0, y: 0 },
-      ghostDraggingStyle: {},
+      ghostStyle: {},
       blockData: {}
     }
   },
@@ -75,66 +74,57 @@ export default {
     },
     handleDragStart(e) {
       const { clientX, clientY, offsetX, offsetY } = e
-      const { offsetHeight, offsetWidth } = e.target.offsetParent.parentElement
+      const {
+        height,
+        width
+      } = e.target.parentNode.parentNode.getBoundingClientRect()
 
-      this.ghostDraggingStyle = {
-        height: `${offsetHeight}px`,
-        width: `${offsetWidth}px`,
+      this.ghostStyle = {
+        height: `${height}px`,
+        width: `${width}px`,
         top: `${clientY}px`,
         left: `${clientX}px`,
         transform: `translate(${-Math.abs(offsetX)}px,${-Math.abs(offsetY)}px)`
       }
 
-      this.dragStartCoords.x = clientX
-      this.dragStartCoords.y = clientY
       this.isDragging = true
     },
     handleDrag(e) {
-      e.preventDefault()
       const { clientX, clientY } = e
+      const { x, y } = e.target.parentNode.parentNode.getBoundingClientRect()
 
-      this.ghostDraggingStyle = {
-        ...this.ghostDraggingStyle,
+      this.ghostStyle = {
+        ...this.ghostStyle,
         top: `${clientY}px`,
         left: `${clientX}px`
       }
 
-      const movementX = clientX - this.dragStartCoords.x
-      const movementY = clientY - this.dragStartCoords.y
+      const movementX = clientX - x
+      const movementY = clientY - y
 
-      if (movementX > 40) {
-        this.dragStartCoords.x = clientX
-
+      if (movementX > 70) {
         if (this.blockData.x < 11) {
           this.blockData.x += 1
         }
-      } else if (movementX < -40) {
-        this.dragStartCoords.x = clientX
-
+      } else if (movementX < -70) {
         if (this.blockData.x > 0) {
           this.blockData.x -= 1
         }
       }
 
-      if (movementY > 20) {
-        this.dragStartCoords.y = clientY
-
+      if (movementY > 50) {
         if (this.blockData.y < 2) {
           this.blockData.y += 1
         }
-      } else if (movementY < -20) {
-        this.dragStartCoords.y = clientY
-
+      } else if (movementY < -50) {
         if (this.blockData.y > 0) {
           this.blockData.y -= 1
         }
       }
     },
-    handleDragEnd(e) {
-      e.preventDefault()
-      this.dragStartCoords = { x: 0, y: 0 }
-      this.ghostDraggingStyle = {}
+    handleDragEnd() {
       this.isDragging = false
+      this.ghostStyle = {}
       this.update({
         id: this.blockData.id,
         data: { ...this.blockData }
@@ -149,7 +139,7 @@ export default {
         offsetLeft
       } = e.target.offsetParent.parentElement
 
-      this.ghostDraggingStyle = {
+      this.ghostStyle = {
         height: `${offsetHeight}px`,
         width: `${offsetWidth}px`,
         top: `${offsetTop}px`,
@@ -174,8 +164,8 @@ export default {
       const ghostH = this.resizeData.h + growthY
       const ghostW = this.resizeData.w + growthX
 
-      this.ghostDraggingStyle = {
-        ...this.ghostDraggingStyle,
+      this.ghostStyle = {
+        ...this.ghostStyle,
         height: `${ghostH}px`,
         width: `${ghostW}px`
       }
@@ -214,7 +204,7 @@ export default {
     },
     handleResizeEnd(e) {
       e.preventDefault()
-      this.ghostDraggingStyle = {}
+      this.ghostStyle = {}
       this.resizeData = {}
       this.isResizing = false
       this.update({
@@ -229,6 +219,7 @@ export default {
 <style>
 .Block {
   @apply relative;
+  user-select: none;
 }
 
 .Block.isDragging .Content,
